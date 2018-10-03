@@ -1,8 +1,9 @@
 import React from 'react';
 import { Mutation } from 'react-apollo';
-import { ADD_RECIPE, GET_ALL_RECIPES } from '../../queries';
+import { ADD_RECIPE, GET_ALL_RECIPES, GET_USER_RECIPES } from '../../queries';
 import ErrorMessage from '../../components/Error';
 import { withRouter } from 'react-router-dom';
+import withAuth from '../withAuth';
 
 const initialState = {
     name: '',
@@ -13,10 +14,10 @@ const initialState = {
 };
 
 class AddRecipe extends React.Component {
-    state = {...initialState}
+    state = { ...initialState }
 
     clearState = () => {
-        this.setState(state => ({...initialState}));
+        this.setState(state => ({ ...initialState }));
     }
 
     componentDidMount() {
@@ -25,7 +26,7 @@ class AddRecipe extends React.Component {
         });
     }
 
-    handleChange = ({ target: { name, value }}) => {
+    handleChange = ({ target: { name, value } }) => {
         this.setState(() => ({
             [name]: value,
         }));
@@ -45,7 +46,7 @@ class AddRecipe extends React.Component {
         return isInvalid;
     }
 
-    updateCache = (cache, { data: {addRecipe} }) => {
+    updateCache = (cache, { data: { addRecipe } }) => {
         const { getAllRecipes } = cache.readQuery({ query: GET_ALL_RECIPES });
         cache.writeQuery({
             query: GET_ALL_RECIPES,
@@ -63,48 +64,52 @@ class AddRecipe extends React.Component {
         return <Mutation
             mutation={ADD_RECIPE}
             variables={{
-                name, 
-                instructions, 
-                category, 
-                description, 
+                name,
+                instructions,
+                category,
+                description,
                 username
             }}
             update={this.updateCache}
+            refetchQueries={() => [
+                { query: GET_USER_RECIPES, variables: { username }},
+            ]}
         >
-        {(addRecipe, { data, error, loading }) => {
-            if(loading) {
-                return <div>Loading</div>
-            }
+            {(addRecipe, { data, error, loading }) => {
+                if (loading) {
+                    return <div>Loading</div>
+                }
 
-            if(error) {
-                return <ErrorMessage error={error} />
-            }
+                if (error) {
+                    return <ErrorMessage error={error} />
+                }
 
-            return (
-                <div className="App">
-                    <h2 className="App">Add Recipe</h2>
-                    <form className="form" onSubmit={(event) => this.handleSubmit(event, addRecipe)}>
-                        <input type="text" value={name} name="name" onChange={this.handleChange} />
-                        <select name="category" value={category} onChange={this.handleChange}>
-                            <option value="Breakfast">Breakfast</option>
-                            <option value="Lunch">Lunch</option>
-                            <option value="Dinner">Dinner</option>
-                            <option value="Snack">Snack</option>
-                        </select>
-                        <input type="text" value={description} name="description" placeholder="Add description" onChange={this.handleChange} />
-                        <textarea name="instructions" value={instructions} onChange={this.handleChange} placeholder="Add Instructions"></textarea>
-                        <button 
-                            disabled={loading || this.validateForm()} 
-                            className="button-primary" 
-                            type="submit">
-                            Submit
+                return (
+                    <div className="App">
+                        <h2 className="App">Add Recipe</h2>
+                        <form className="form" onSubmit={(event) => this.handleSubmit(event, addRecipe)}>
+                            <input type="text" value={name} name="name" onChange={this.handleChange} />
+                            <select name="category" value={category} onChange={this.handleChange}>
+                                <option value="Breakfast">Breakfast</option>
+                                <option value="Lunch">Lunch</option>
+                                <option value="Dinner">Dinner</option>
+                                <option value="Snack">Snack</option>
+                            </select>
+                            <input type="text" value={description} name="description" placeholder="Add description" onChange={this.handleChange} />
+                            <textarea name="instructions" value={instructions} onChange={this.handleChange} placeholder="Add Instructions"></textarea>
+                            <button
+                                disabled={loading || this.validateForm()}
+                                className="button-primary"
+                                type="submit">
+                                Submit
                         </button>
-                    </form>
-                </div>
-            );
-        }}
+                        </form>
+                    </div>
+                );
+            }}
         </Mutation>
     }
 }
 
-export default withRouter(AddRecipe);
+export default
+    withAuth(session => session && session.getCurrentUser)(withRouter(AddRecipe));

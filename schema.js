@@ -34,8 +34,11 @@ type Token {
 
 type Mutation {
     addRecipe(name: String!, description: String!, category: String!, instructions: String!, username: String): Recipe
+    deleteUserRecipe(_id: ID): Recipe
     signinUser(username: String!, password: String!): Token
     signupUser(username: String!, email: String!, password: String!): Token
+    likeRecipe(_id: ID!, username: String!): Recipe
+    unlikeRecipe(_id: ID!, username: String!): Recipe
 }
 
 `;

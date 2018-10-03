@@ -17,10 +17,10 @@ exports.resolvers = {
         getUserRecipes: async (root, { username }, { Recipe }) => {
             const userRecipes = await Recipe.find({ username }).sort({ createdDate: 'desc' });
             return userRecipes;
-        },        
+        },
 
         getCurrentUser: async (root, args, { User, currentUser }) => {
-            if(!currentUser) {
+            if (!currentUser) {
                 return null;
             }
 
@@ -34,21 +34,21 @@ exports.resolvers = {
 
         getRecipe: async (root, { _id }, { Recipe }) => {
             const recipe = await Recipe.findOne({ _id });
-            if(!recipe) {
+            if (!recipe) {
                 throw new Error('Recipe does not exists');
             }
-            return recipe; 
+            return recipe;
         },
 
         searchRecipes: async (root, { searchTerm }, { Recipe }) => {
-            if(searchTerm) {
+            if (searchTerm) {
                 const searchResults = await Recipe.find({
                     $text: { $search: searchTerm }
                 }, {
-                    score: { $meta: 'textScore' }
-                }).sort({
-                    score: { $meta: 'textScore' }
-                });
+                        score: { $meta: 'textScore' }
+                    }).sort({
+                        score: { $meta: 'textScore' }
+                    });
 
                 return searchResults;
             } else {
@@ -70,16 +70,41 @@ exports.resolvers = {
             return newRecipe;
         },
 
+        likeRecipe: async (root, { _id, username }, { Recipe, User }) => {
+            const recipe = await Recipe.findOneAndUpdate({ _id }, { $inc: { likes: 1 } });
+            const user = await User.findOneAndUpdate({ username }, {
+                $addToSet: {
+                    favorites: _id
+                }
+            });
+            return recipe;
+        },
+
+        unlikeRecipe: async (root, { _id, username }, { Recipe, User }) => {
+            const recipe = await Recipe.findOneAndUpdate({ _id }, { $inc: { likes: -1 } });
+            const user = await User.findOneAndUpdate({ username }, {
+                $pull: {
+                    favorites: _id
+                }
+            });
+            return recipe;
+        },        
+
+        deleteUserRecipe: async (root, { _id }, { Recipe }) => {
+            const recipe = await Recipe.findOneAndRemove({ _id });
+            return recipe;
+        },
+
         signinUser: async (root, { username, password }, { User }) => {
             const user = await User.findOne({ username });
 
-            if(!user) {
+            if (!user) {
                 throw new Error('User does not exists.');
             }
 
             const isValidPassword = await bcrypt.compare(password, user.password);
 
-            if(!isValidPassword) {
+            if (!isValidPassword) {
                 throw new Error('Incorrect Password');
             }
 
@@ -89,13 +114,13 @@ exports.resolvers = {
         signupUser: async (root, { username, password, email }, { User }) => {
             const user = await User.findOne({ username });
 
-            if(user) {
+            if (user) {
                 throw new Error('User already exists.');
             }
 
             const newUser = await new User({
-                username, 
-                password, 
+                username,
+                password,
                 email,
             }).save();
             return { token: createToken(newUser, process.env.SECRET, '1hr') };
