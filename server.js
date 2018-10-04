@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
+const path = requrie('path');
 const bodyParser = require('body-parser');
 const Recipe = require('./models/Recipe');
 const User = require('./models/User');
@@ -46,7 +47,7 @@ app.use(async (req, res, next) => {
     next();
 });
 
-app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+// app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
 app.use('/graphql', bodyParser.json(), graphqlExpress((req, res) => ({
     schema,
@@ -56,6 +57,14 @@ app.use('/graphql', bodyParser.json(), graphqlExpress((req, res) => ({
         currentUser: req.currentUser,
     }
 })))
+
+if(process.env.NODE_ENV === 'production') {
+    app.use(express.static('client/build'));
+
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+    });
+}
 
 const PORT = process.env.PORT || 4444;
 
