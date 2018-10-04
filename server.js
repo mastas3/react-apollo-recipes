@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const path = requrie('path');
+const path = require('path');
 const bodyParser = require('body-parser');
 const Recipe = require('./models/Recipe');
 const User = require('./models/User');
