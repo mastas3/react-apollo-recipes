@@ -4,6 +4,7 @@ type Recipe {
     _id: ID
     name: String!
     category: String!
+    imageUrl: String!
     description: String!
     instructions: String!
     createdDate: String
@@ -33,7 +34,7 @@ type Token {
 }
 
 type Mutation {
-    addRecipe(name: String!, description: String!, category: String!, instructions: String!, username: String): Recipe
+    addRecipe(name: String!, description: String!, imageUrl: String!, category: String!, instructions: String!, username: String): Recipe
     deleteUserRecipe(_id: ID): Recipe
     signinUser(username: String!, password: String!): Token
     signupUser(username: String!, email: String!, password: String!): Token

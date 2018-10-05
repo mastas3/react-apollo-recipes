@@ -7,6 +7,7 @@ export const GET_ALL_RECIPES = gql`
         getAllRecipes {
             _id
             name
+            imageUrl
             category
         }
     }
@@ -38,12 +39,14 @@ export const ADD_RECIPE = gql`
         $name: String!, 
         $description: String!, 
         $category: String!, 
+        $imageUrl: String!
         $instructions: String!, 
         $username: String){
         addRecipe(
             name: $name, 
             description: $description, 
             category: $category, 
+            imageUrl: $imageUrl,
             instructions: $instructions, 
             username: $username            
         ){

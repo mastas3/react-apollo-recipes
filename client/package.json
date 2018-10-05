@@ -7,12 +7,12 @@
     "jwt-decode": "^2.2.0",
     "react": "^16.5.1",
     "react-apollo": "^2.1.11",
+    "react-ckeditor-component": "^1.1.0",
     "react-dom": "^16.5.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.5"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

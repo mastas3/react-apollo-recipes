@@ -7,6 +7,7 @@ export const recipeFragments = {
             name
             category
             instructions
+            imageUrl
             createdDate
             username
             likes            

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Mutation } from 'react-apollo';
 import { ADD_RECIPE, GET_ALL_RECIPES, GET_USER_RECIPES } from '../../queries';
+import CKEditor from 'react-ckeditor-component';
 import ErrorMessage from '../../components/Error';
 import { withRouter } from 'react-router-dom';
 import withAuth from '../withAuth';
@@ -9,6 +10,7 @@ const initialState = {
     name: '',
     instructions: '',
     category: 'Breakfast',
+    imageUrl: '',
     description: '',
     username: '',
 };
@@ -32,6 +34,13 @@ class AddRecipe extends React.Component {
         }));
     }
 
+    handleEditorChange = event => {
+        const newContent = event.editor.getData();
+        this.setState({
+            instructions: newContent
+        });
+    }
+
     handleSubmit = (event, addRecipe) => {
         event.preventDefault();
         addRecipe().then(({ data }) => {
@@ -41,8 +50,8 @@ class AddRecipe extends React.Component {
     }
 
     validateForm = () => {
-        const { name, instructions, category, description } = this.state;
-        const isInvalid = !name || !category || !description || !instructions;
+        const { name, instructions, category, description, imageUrl } = this.state;
+        const isInvalid = !name || !imageUrl || !category || !description || !instructions;
         return isInvalid;
     }
 
@@ -60,7 +69,7 @@ class AddRecipe extends React.Component {
     }
 
     render() {
-        const { name, instructions, category, description, username } = this.state;
+        const { name, instructions, category, description, username, imageUrl } = this.state;
         return <Mutation
             mutation={ADD_RECIPE}
             variables={{
@@ -68,6 +77,7 @@ class AddRecipe extends React.Component {
                 instructions,
                 category,
                 description,
+                imageUrl,
                 username
             }}
             update={this.updateCache}
@@ -96,7 +106,13 @@ class AddRecipe extends React.Component {
                                 <option value="Snack">Snack</option>
                             </select>
                             <input type="text" value={description} name="description" placeholder="Add description" onChange={this.handleChange} />
-                            <textarea name="instructions" value={instructions} onChange={this.handleChange} placeholder="Add Instructions"></textarea>
+                            <input type="text" value={imageUrl} name="imageUrl" placeholder="Image Url" onChange={this.handleChange} />
+                            <label htmlFor="instructions">Add Instructions</label>
+                            <CKEditor 
+                                name="instructions"
+                                content={instructions}
+                                events={{ change: this.handleEditorChange }}
+                            />
                             <button
                                 disabled={loading || this.validateForm()}
                                 className="button-primary"
