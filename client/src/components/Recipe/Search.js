@@ -23,6 +23,7 @@ export default class Search extends React.Component {
                     <div className="App">
                         <input 
                             type="search" 
+                            className="search"
                             placeholder="Search for Recipes"
                             onChange={async event => {
                                 event.persist();

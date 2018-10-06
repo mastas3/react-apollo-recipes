@@ -6,6 +6,7 @@ import { GET_USER_RECIPES,
          GET_CURRENT_USER,
         } from '../../queries';
 import { Link } from 'react-router-dom';
+import Spinner from '../Spinner';
 
 const handleDelete = deleteUserRecipe => {
     const confirmDelete = window.confirm('Are you sure you want to delete this recipe?');
@@ -29,7 +30,7 @@ const UserRecipes = ({ username }) => (
                 return <div>Erorr</div>;
             }
             if (loading) {
-                return <div>Loading...</div>;
+                return <Spinner />;
             }
 
             return (

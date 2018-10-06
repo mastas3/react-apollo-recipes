@@ -4,6 +4,7 @@ import { Query } from 'react-apollo';
 import { GET_RECIPE } from '../../queries';
 import ErrorMessage from '../../components/Error';
 import LikeRecipe from './LikeRecipe';
+import Spinner from '../Spinner';
 
 const RecipePage = ({ match }) => {
     const { _id } = match.params;
@@ -20,7 +21,7 @@ const RecipePage = ({ match }) => {
                 }
 
                 if (loading) {
-                    return <div>Loading</div>
+                    return <Spinner />;
                 }
 
                 const { getRecipe: recipe } = data;
